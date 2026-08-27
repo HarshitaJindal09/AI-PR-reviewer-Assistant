@@ -9,7 +9,6 @@ function App() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   const [prUrl, setPrUrl] = useState("");
 
   const analyzePR = async () => {
@@ -103,7 +102,6 @@ function App() {
 
         {/* Input Card */}
         <section className="input-card">
-
           <div className="input-group pr-url-group">
             <label>GitHub Pull Request URL</label>
 
@@ -122,7 +120,6 @@ function App() {
           >
             {loading ? "Analyzing..." : "Analyze PR →"}
           </button>
-
         </section>
 
         {/* Error */}
@@ -138,7 +135,6 @@ function App() {
 
             {/* PR Information */}
             <div className="pr-header">
-
               <div>
                 <div className="repo-name">
                   {owner} / {repo}
@@ -175,7 +171,6 @@ function App() {
               >
                 View on GitHub ↗
               </a>
-
             </div>
 
             {/* AI Review */}
@@ -245,7 +240,6 @@ function App() {
 
                     {result.review.findings?.map(
                       (finding, index) => (
-
                         <div
                           className="finding"
                           key={index}
@@ -302,6 +296,69 @@ function App() {
 
                   </div>
                 </div>
+
+                {/* Changed Files */}
+                <div className="section-card">
+
+                  <div className="section-title">
+                    <h3>Changed Files</h3>
+
+                    <span>
+                      {result.files?.length || 0} files
+                    </span>
+                  </div>
+
+                  <div className="changed-files">
+
+                    {result.files?.map((file, index) => (
+                      <div
+                        className="changed-file"
+                        key={index}
+                      >
+
+                        {/* File Header */}
+                        <div className="file-header">
+
+                          <div>
+                            <span className="file-name">
+                              📄 {file.filename}
+                            </span>
+
+                            <span
+                              className={`file-status ${file.status}`}
+                            >
+                              {file.status}
+                            </span>
+                          </div>
+
+                          <div className="file-stats">
+
+                            <span className="additions">
+                              +{file.additions}
+                            </span>
+
+                            <span className="deletions">
+                              -{file.deletions}
+                            </span>
+
+                          </div>
+
+                        </div>
+
+                        {/* GitHub Diff */}
+                        {file.patch && (
+                          <pre className="diff">
+                            {file.patch}
+                          </pre>
+                        )}
+
+                      </div>
+                    ))}
+
+                  </div>
+
+                </div>
+
               </>
             )}
 
