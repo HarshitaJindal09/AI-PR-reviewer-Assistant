@@ -12,12 +12,12 @@ function App() {
   const [prUrl, setPrUrl] = useState("");
 
   const analyzePR = async () => {
-    if (!prUrl) {
+    if (!prUrl.trim()) {
       setError("Please enter a GitHub Pull Request URL.");
       return;
     }
 
-    const match = prUrl.match(
+    const match = prUrl.trim().match(
       /^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)\/?$/
     );
 
@@ -64,7 +64,7 @@ function App() {
 
       setResult(data);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -102,6 +102,7 @@ function App() {
 
         {/* Input Card */}
         <section className="input-card">
+
           <div className="input-group pr-url-group">
             <label>GitHub Pull Request URL</label>
 
@@ -110,6 +111,11 @@ function App() {
               placeholder="https://github.com/facebook/react/pull/1"
               value={prUrl}
               onChange={(e) => setPrUrl(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  analyzePR();
+                }
+              }}
             />
           </div>
 
@@ -120,6 +126,7 @@ function App() {
           >
             {loading ? "Analyzing..." : "Analyze PR →"}
           </button>
+
         </section>
 
         {/* Error */}
@@ -135,6 +142,7 @@ function App() {
 
             {/* PR Information */}
             <div className="pr-header">
+
               <div>
                 <div className="repo-name">
                   {owner} / {repo}
@@ -171,12 +179,14 @@ function App() {
               >
                 View on GitHub ↗
               </a>
+
             </div>
 
             {/* AI Review */}
             {result.review && (
               <>
-                {/* Score / Risk */}
+
+                {/* Score / Risk / Findings */}
                 <div className="stats">
 
                   <div className="stat-card">
@@ -216,144 +226,223 @@ function App() {
 
                 </div>
 
-                {/* Summary */}
+                {/* AI Summary */}
                 <div className="section-card">
+
                   <h3>AI Summary</h3>
 
                   <p className="summary">
                     {result.review.summary}
                   </p>
+
                 </div>
 
-                {/* Findings */}
+                {/* Code Review Findings */}
                 <div className="section-card">
 
                   <div className="section-title">
-                    <h3>Code Review Findings</h3>
+
+                    <h3>
+                      Code Review Findings
+                    </h3>
 
                     <span>
                       {result.review.findings?.length || 0} issues
                     </span>
+
                   </div>
 
                   <div className="findings">
 
-                    {result.review.findings?.map(
-                      (finding, index) => (
-                        <div
-                          className="finding"
-                          key={index}
-                        >
+                    {result.review.findings?.length > 0 ? (
+                      result.review.findings.map(
+                        (finding, index) => (
 
-                          <div className="finding-top">
+                          <div
+                            className="finding"
+                            key={index}
+                          >
 
-                            <span
-                              className={`severity ${String(
-                                finding.severity
-                              ).toLowerCase()}`}
-                            >
-                              {finding.severity}
-                            </span>
+                            <div className="finding-top">
 
-                            <span className="category">
-                              {finding.category}
-                            </span>
-
-                          </div>
-
-                          <h4>
-                            {finding.title}
-                          </h4>
-
-                          <div className="file">
-                            📄 {finding.file}
-
-                            {finding.line && (
-                              <span>
-                                {" "}
-                                : {finding.line}
+                              <span
+                                className={`severity ${String(
+                                  finding.severity
+                                ).toLowerCase()}`}
+                              >
+                                {finding.severity}
                               </span>
-                            )}
-                          </div>
 
-                          <p>
-                            {finding.explanation}
-                          </p>
+                              <span className="category">
+                                {finding.category}
+                              </span>
 
-                          <div className="suggestion">
-                            <strong>
-                              💡 Suggestion
-                            </strong>
+                            </div>
+
+                            <h4>
+                              {finding.title}
+                            </h4>
+
+                            <div className="file">
+                              📄 {finding.file}
+
+                              {finding.line && (
+                                <span>
+                                  {" "}
+                                  : {finding.line}
+                                </span>
+                              )}
+                            </div>
 
                             <p>
-                              {finding.suggestion}
+                              {finding.explanation}
                             </p>
+
+                            <div className="suggestion">
+
+                              <strong>
+                                💡 Suggestion
+                              </strong>
+
+                              <p>
+                                {finding.suggestion}
+                              </p>
+
+                            </div>
+
                           </div>
 
-                        </div>
+                        )
                       )
+                    ) : (
+                      <p className="no-findings">
+                        🎉 No significant issues found.
+                      </p>
                     )}
 
                   </div>
+
                 </div>
 
                 {/* Changed Files */}
                 <div className="section-card">
 
                   <div className="section-title">
-                    <h3>Changed Files</h3>
+
+                    <h3>
+                      Changed Files
+                    </h3>
 
                     <span>
                       {result.files?.length || 0} files
                     </span>
+
                   </div>
 
                   <div className="changed-files">
 
-                    {result.files?.map((file, index) => (
-                      <div
-                        className="changed-file"
-                        key={index}
-                      >
+                    {result.files?.length > 0 ? (
 
-                        {/* File Header */}
-                        <div className="file-header">
+                      result.files.map((file, index) => (
 
-                          <div>
-                            <span className="file-name">
-                              📄 {file.filename}
-                            </span>
+                        <div
+                          className="changed-file"
+                          key={index}
+                        >
 
-                            <span
-                              className={`file-status ${file.status}`}
-                            >
-                              {file.status}
-                            </span>
+                          {/* File Header */}
+                          <div className="file-header">
+
+                            <div className="file-info">
+
+                              <span className="file-icon">
+                                📄
+                              </span>
+
+                              <strong>
+                                {file.filename}
+                              </strong>
+
+                              <span
+                                className={`file-status ${String(
+                                  file.status
+                                ).toLowerCase()}`}
+                              >
+                                {file.status}
+                              </span>
+
+                            </div>
+
+                            <div className="file-stats">
+
+                              <span className="additions">
+                                +{file.additions}
+                              </span>
+
+                              <span className="deletions">
+                                -{file.deletions}
+                              </span>
+
+                            </div>
+
                           </div>
 
-                          <div className="file-stats">
+                          {/* GitHub-style Diff */}
+                          {file.patch && (
+                            <div className="diff">
 
-                            <span className="additions">
-                              +{file.additions}
-                            </span>
+                              {file.patch
+                                .split("\n")
+                                .map((line, lineIndex) => {
 
-                            <span className="deletions">
-                              -{file.deletions}
-                            </span>
+                                  let className =
+                                    "diff-line";
 
-                          </div>
+                                  if (
+                                    line.startsWith("+") &&
+                                    !line.startsWith("+++")
+                                  ) {
+                                    className += " added";
+                                  } else if (
+                                    line.startsWith("-") &&
+                                    !line.startsWith("---")
+                                  ) {
+                                    className += " removed";
+                                  } else if (
+                                    line.startsWith("@@")
+                                  ) {
+                                    className += " header";
+                                  }
+
+                                  return (
+                                    <div
+                                      className={className}
+                                      key={lineIndex}
+                                    >
+                                      {line || " "}
+                                    </div>
+                                  );
+
+                                })}
+
+                            </div>
+                          )}
+
+                          {!file.patch && (
+                            <div className="no-patch">
+                              No diff available for this file.
+                            </div>
+                          )}
 
                         </div>
 
-                        {/* GitHub Diff */}
-                        {file.patch && (
-                          <pre className="diff">
-                            {file.patch}
-                          </pre>
-                        )}
+                      ))
 
-                      </div>
-                    ))}
+                    ) : (
+                      <p className="no-findings">
+                        No changed files found.
+                      </p>
+                    )}
 
                   </div>
 

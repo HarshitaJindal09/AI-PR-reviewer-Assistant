@@ -469,3 +469,75 @@ footer {
   background: #080d16;
   white-space: pre-wrap;
 }
+
+/* Changed Files */
+
+.changed-files {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.changed-file {
+  background: #0b1020;
+  border: 1px solid #26324d;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.file-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid #26324d;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.file-info strong {
+  color: #e5e7eb;
+  font-size: 14px;
+}
+
+.file-icon {
+  font-size: 15px;
+}
+
+.file-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.additions {
+  color: #4ade80;
+}
+
+.deletions {
+  color: #f87171;
+}
+
+.file-status {
+  padding: 8px 16px;
+  font-size: 12px;
+  color: #8fa2c7;
+  text-transform: capitalize;
+}
+
+.diff {
+  margin: 0;
+  padding: 16px;
+  background: #080c16;
+  color: #cbd5e1;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre;
+}
